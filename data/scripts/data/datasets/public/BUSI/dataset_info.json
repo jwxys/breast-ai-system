@@ -1,0 +1,22 @@
+{
+  "name": "BUSI - Breast Ultrasound Images Dataset",
+  "version": "1.0",
+  "source": "Kaggle",
+  "url": "https://www.kaggle.com/datasets/aryashah2k/breast-ultrasound-images-dataset",
+  "size_samples": 780,
+  "categories": {
+    "normal": 133,
+    "benign": 437,
+    "malignant": 210
+  },
+  "annotation_types": [
+    "classification",
+    "segmentation"
+  ],
+  "modality": "ultrasound",
+  "organ": "breast",
+  "license": "Public Domain",
+  "citation": "@dataset{al-dhabyani2020busi,\n  title={Dataset of breast ultrasound images},\n  author={Al-Dhabyani, Walid and Gomaa, Mohammed and Khaled, Hussien and Fahmy, Aly},\n  year={2020},\n  publisher={Elsevier}\n}",
+  "downloaded_at": "2026-05-28T23:07:42.002013",
+  "download_path": "/workspace/breast-ai-system/data/scripts/data/datasets/public/BUSI"
+}

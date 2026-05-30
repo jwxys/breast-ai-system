@@ -1,0 +1,14 @@
+{
+  "name": "UCI Wisconsin Breast Cancer Diagnostic",
+  "version": "1.0",
+  "source": "UCI Machine Learning Repository",
+  "urls": {
+    "data": "https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.data",
+    "features": "https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.names"
+  },
+  "size_samples": 569,
+  "features": 30,
+  "classes": 2,
+  "year": 1995,
+  "license": "Public Domain"
+}

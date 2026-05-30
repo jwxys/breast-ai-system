@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+.tmp/
+
+# Model weights (too large for GitHub)
+models/*.pth
+models/*.pt
+models/*.onnx
+
+# Large datasets
+data/datasets/public/BUSI/images/
+data/datasets/public/UCI-Breast-Cancer/wdbc.data
+
+# Backup files
+*.bak
+*.backup
+*.tar.gz

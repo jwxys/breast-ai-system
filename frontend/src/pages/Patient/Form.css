@@ -1,0 +1,64 @@
+/**
+ * 患者表单样式
+ */
+
+.patient-form-container {
+  padding: 24px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.back-btn {
+  margin-bottom: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.form-card {
+  max-width: 1000px;
+  margin: 0 auto;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.form-header .ant-typography {
+  margin-bottom: 8px;
+}
+
+.form-steps {
+  margin-bottom: 40px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.step-content {
+  padding: 24px 0;
+}
+
+/* 按钮组 */
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.form-buttons .left-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+/* 暗色模式支持 */
+.dark .patient-form-container {
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+}
+
+.dark .form-card {
+  background: #1e293b;
+}

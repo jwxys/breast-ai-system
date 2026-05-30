@@ -1,0 +1,29 @@
+[Unit]
+Description=Breast AI Diagnostic System - Backend Service
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/workspace/breast-ai-system/backend
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONUNBUFFERED=1"
+Environment="DATABASE_URL=postgresql://breast_ai_user:secure_password_2026@localhost:5432/breast_ai_db"
+Environment="SECRET_KEY=your-secret-key-change-in-production"
+Environment="DEBUG=false"
+
+ExecStart=/usr/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+
+Restart=always
+RestartSec=10
+
+NoNewPrivileges=true
+PrivateTmp=true
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=breast-ai-backend
+
+[Install]
+WantedBy=multi-user.target

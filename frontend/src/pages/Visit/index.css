@@ -1,0 +1,230 @@
+/**
+ * 随访管理页面样式
+ */
+
+.visit-list-container {
+  padding: 24px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+/* 统计卡片 */
+.stats-row {
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: white;
+}
+
+.stat-icon {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: white;
+  opacity: 0.9;
+}
+
+.stat-content {
+  padding: 24px;
+  padding-right: 120px;
+}
+
+.stat-title {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.stat-trend {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.trend-up {
+  color: #10b981;
+}
+
+.trend-down {
+  color: #ef4444;
+}
+
+/* 图表卡片 */
+.charts-row {
+  margin-bottom: 16px;
+}
+
+.chart-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: white;
+}
+
+.chart-card .ant-card-head {
+  border-bottom: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.02) 0%, rgba(118, 75, 162, 0.02) 100%);
+}
+
+/* 列表卡片 */
+.list-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: white;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(118, 75, 162, 0.03) 100%);
+  border-bottom: 1px solid #e2e8f0;
+  margin: -24px -24px 24px -24px;
+  padding-bottom: 16px;
+}
+
+.header-left .page-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.title-icon {
+  color: #667eea;
+  font-size: 28px;
+}
+
+/* 筛选区域 */
+.filter-section {
+  margin-bottom: 24px;
+}
+
+.filter-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.filter-info {
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.02) 0%, rgba(118, 75, 162, 0.02) 100%);
+  border-radius: 12px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.text-success {
+  color: #10b981;
+}
+
+.text-primary {
+  color: #667eea;
+}
+
+/* 患者单元格 */
+.patient-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.patient-name {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 15px;
+}
+
+.patient-no {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* 随访日期 */
+.visit-date {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #64748b;
+}
+
+/* 状态指示点 */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px currentColor;
+  margin-right: 8px;
+}
+
+.status-dot.high {
+  background: #ef4444;
+  color: #ef4444;
+}
+
+.status-dot.medium {
+  background: #f59e0b;
+  color: #f59e0b;
+}
+
+.status-dot.low {
+  background: #10b981;
+  color: #10b981;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .patient-list-container {
+    padding: 12px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    gap: 16px;
+    margin: -12px -12px 16px -12px;
+    padding: 16px;
+  }
+
+  .filter-row {
+    flex-direction: column;
+  }
+
+  .filter-row > * {
+    width: 100%;
+  }
+
+  .stat-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+  }
+
+  .stat-value {
+    font-size: 28px;
+  }
+}

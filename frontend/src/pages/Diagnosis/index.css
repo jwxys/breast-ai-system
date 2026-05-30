@@ -1,0 +1,48 @@
+/**
+ * AI 诊断页面样式
+ */
+
+.ai-diagnosis-container {
+  padding: 24px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.model-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.status-dot.high {
+  background: #ef4444;
+  color: #ef4444;
+}
+
+.status-dot.medium {
+  background: #f59e0b;
+  color: #f59e0b;
+}
+
+.status-dot.low {
+  background: #10b981;
+  color: #10b981;
+}
+
+/* 暗黑模式支持 */
+.dark .ai-diagnosis-container,
+.dark .treatment-container {
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+}
+
+.dark .ant-card {
+  background: #1e293b;
+}
