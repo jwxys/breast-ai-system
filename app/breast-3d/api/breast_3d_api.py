@@ -367,7 +367,7 @@ async def preprocess_images(
         
         # 对比度增强
         if enhance_contrast:
-            img = enhance_contrast CLAHE(img)
+            img = enhance_contrast_CLAHE(img)
         
         processed.append(img)
     

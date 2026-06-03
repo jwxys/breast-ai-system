@@ -94,7 +94,7 @@ class BreastUltrasoundDataset(Dataset):
         return augmentations(image)
 
 
-class EfficientNetBI RADS(nn.Module):
+class EfficientNetBIRADS(nn.Module):
     """
     基于 EfficientNet 的 BI-RADS 分类器
     """

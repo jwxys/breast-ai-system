@@ -232,7 +232,7 @@ const DiagnosisCreate: React.FC = () => {
           
           <Alert
             message="提示"
-            description="选择病灶后，可点击右侧"智能评估"按钮自动计算 BI-RADS 分级"
+            description="选择病灶后，可点击右侧'智能评估'按钮自动计算 BI-RADS 分级"
             type="info"
             showIcon
           />
@@ -256,8 +256,8 @@ const DiagnosisCreate: React.FC = () => {
             <Col span={8}>
               <Form.Item name="orientation" label="纵横比">
                 <Select>
-                  <Select.Option value="parallel">平行 (宽>高)</Select.Option>
-                  <Select.Option value="not_parallel">非平行 (高>宽)</Select.Option>
+                  <Select.Option value="parallel">平行 （宽＞高）</Select.Option>
+                  <Select.Option value="not_parallel">非平行 (高＞宽)</Select.Option>
                 </Select>
               </Form.Item>
             </Col>
