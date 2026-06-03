@@ -6,6 +6,7 @@
 
 from .diagnosis_api import router as diagnosis_router
 from .reports_api import router as reports_router
+from .advanced_diagnosis_api import router as advanced_diagnosis_router
 
 
-__all__ = ["diagnosis_router", "reports_router"]
+__all__ = ["diagnosis_router", "reports_router", "advanced_diagnosis_router"]

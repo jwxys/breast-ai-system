@@ -102,17 +102,20 @@ def register_routers(app: FastAPI):
     """
     from app.diagnosis.api.diagnosis_api import router as diagnosis_router
     from app.diagnosis.api.reports_api import router as reports_router
+    from app.diagnosis.api.advanced_diagnosis_api import router as advanced_diagnosis_router
     from app.inference.api.inference_api import router as inference_router
     from app.statistics.api.stats_api import router as statistics_router
     
     # 注册路由
     app.include_router(diagnosis_router)
     app.include_router(reports_router)
+    app.include_router(advanced_diagnosis_router)
     app.include_router(inference_router)
     app.include_router(statistics_router)
     
     logger.info("📦 已注册路由:")
     logger.info("  - /api/v1/diagnosis (诊断核心)")
+    logger.info("  - /api/v1/diagnosis/advanced (高级诊断)")
     logger.info("  - /api/v1/inference (AI 推理)")
     logger.info("  - /api/v1/statistics (统计分析)")
     logger.info("  - /api/v1/reports (报告管理)")
