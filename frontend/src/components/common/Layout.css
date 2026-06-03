@@ -1,0 +1,258 @@
+/**
+ * Layout 响应式样式
+ * 移动端优先设计
+ */
+
+/* 移动端菜单按钮 */
+.mobile-menu-btn {
+  display: none;
+}
+
+/* 响应式断点 */
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: block;
+  }
+
+  .hidden-mobile {
+    display: none !important;
+  }
+
+  .app-sider {
+    display: none;
+  }
+
+  .app-header {
+    padding: 0 16px !important;
+  }
+
+  .page-title {
+    font-size: 16px !important;
+  }
+
+  .app-content {
+    margin: 12px !important;
+    padding: 16px !important;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .notification-icon {
+    font-size: 18px !important;
+  }
+
+  .user-info {
+    gap: 4px !important;
+  }
+
+  .header-actions {
+    gap: 8px !important;
+  }
+}
+
+/* 平板端适配 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .app-sider {
+    width: 200px !important;
+  }
+
+  .page-title {
+    font-size: 18px !important;
+  }
+
+  .app-content {
+    margin: 16px !important;
+    padding: 20px !important;
+  }
+}
+
+/* 桌面端适配 */
+@media (min-width: 1025px) {
+  .app-sider {
+    width: 256px !important;
+  }
+
+  .page-title {
+    font-size: 20px !important;
+  }
+
+  .app-content {
+    margin: 24px !important;
+    padding: 24px !important;
+  }
+}
+
+/* 大屏适配 */
+@media (min-width: 1440px) {
+  .app-content {
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Logo 动画 */
+.logo {
+  height: 64px;
+  margin: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 600;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.logo:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 用户信息样式 */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.user-info:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.dark .user-info:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.user-avatar {
+  transition: transform 0.2s ease;
+}
+
+.user-info:hover .user-avatar {
+  transform: scale(1.1);
+}
+
+/* 通知图标 */
+.notification-icon {
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.notification-icon:hover {
+  transform: scale(1.1);
+}
+
+/* 内容区平滑滚动 */
+.app-content {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 加载状态骨架屏 */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.dark .skeleton {
+  background: linear-gradient(
+    90deg,
+    #2a2a2a 25%,
+    #3a3a3a 50%,
+    #2a2a2a 75%
+  );
+}
+
+/* 玻璃拟态效果 (用于头部) */
+.header-glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark .header-glass {
+  background: rgba(17, 24, 39, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 响应式网格布局 */
+.responsive-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1440px) {
+  .responsive-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* 卡片响应式 */
+.responsive-card {
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .responsive-card {
+    border-radius: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-card {
+    border-radius: 20px;
+  }
+}
+
+/* 浮动操作按钮 (移动端) */
+.fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+@media (min-width: 768px) {
+  .fab {
+    display: none;
+  }
+}

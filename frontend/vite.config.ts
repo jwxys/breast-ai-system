@@ -9,6 +9,20 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    host: '0.0.0.0',
+    port: 3000,
+    allowedHosts: [
+      'monkeycode-ai.online',
+      '*.monkeycode-ai.online',
+      '127.0.0.1',
+      'localhost'
+    ],
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: 3001,
+  },
   build: {
     outDir: 'dist',
     sourcemap: true,
@@ -21,26 +35,5 @@ export default defineConfig({
         },
       },
     },
-  },
-  server: {
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '*.monkeycode-ai.online': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-      },
-    },
-  },
-  preview: {
-    port: 3001,
-  },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './tests/setup.ts',
   },
 });

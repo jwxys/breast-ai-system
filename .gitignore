@@ -13,6 +13,7 @@ env/
 node_modules/
 npm-debug.log
 yarn-error.log
+dist/
 
 # IDE
 .vscode/
@@ -22,25 +23,15 @@ yarn-error.log
 
 # Environment
 .env
-.env.local
+.env.production
 
 # Logs
 *.log
 
-# Temporary files
-*.tmp
-.tmp/
+# OS
+.DS_Store
+Thumbs.db
 
-# Model weights (too large for GitHub)
-models/*.pth
-models/*.pt
-models/*.onnx
-
-# Large datasets
-data/datasets/public/BUSI/images/
-data/datasets/public/UCI-Breast-Cancer/wdbc.data
-
-# Backup files
-*.bak
-*.backup
-*.tar.gz
+# Build
+*.egg-info/
+.eggs/
