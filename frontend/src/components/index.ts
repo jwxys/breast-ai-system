@@ -1,4 +1,3 @@
-export * from './patient';
-export * from './visit';
-export * from './ultrasound';
-export * from './common';
+// 组件导出 (简化版)
+export { AppLayout } from './common/Layout';
+export { MedicalColors, BIRADSIndicator, RiskGauge, DiagnosisCard } from './ui/MedicalUI';

@@ -1,3 +1,2 @@
-// 3D 重建模块导出
-export { default as Breast3DModelingPage } from './index';
+// 3D 乳腺查看器模块导出
 export { Breast3DViewer } from './components/Breast3DViewer';

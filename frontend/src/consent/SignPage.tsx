@@ -27,7 +27,7 @@ import {
   CalendarOutlined,
   UserOutlined,
   SaveOutlined,
-  PrintOutlined,
+  PrinterOutlined,
   DownloadOutlined,
 } from '@ant-design/icons';
 import SignatureCanvas from 'react-signature-canvas';
@@ -219,7 +219,7 @@ const InformedConsentSignPage: React.FC<InformedConsentSignPageProps> = ({
             }
             extra={
               <Space>
-                <Button icon={<PrintOutlined />} onClick={handlePrint}>
+                <Button icon={<PrinterOutlined />} onClick={handlePrint}>
                   打印
                 </Button>
                 <Button icon={<DownloadOutlined />} onClick={handleDownload}>
@@ -471,7 +471,7 @@ const InformedConsentSignPage: React.FC<InformedConsentSignPageProps> = ({
                   </Button>,
                   <Button
                     key="print"
-                    icon={<PrintOutlined />}
+                    icon={<PrinterOutlined />}
                     onClick={handlePrint}
                   >
                     打印

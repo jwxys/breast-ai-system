@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Layout, Menu, Avatar, Dropdown, Badge, Button, Drawer, Space, Breadcrumb, theme } from 'antd';
+import { Layout, Menu, Avatar, Dropdown, Badge, Button, Drawer, Breadcrumb, theme } from 'antd';
 import {
   HomeOutlined,
   UserOutlined,
@@ -27,7 +27,7 @@ import {
   MoonOutlined,
   SunOutlined,
   DashboardOutlined,
-  AiOutlined,
+  ApiOutlined,
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import type { MenuProps } from 'antd';
@@ -76,7 +76,7 @@ export const AppLayout = () => {
     { type: 'divider' },
     { key: '/treatment', icon: <MedicineBoxOutlined />, label: '治疗方案', },
     { key: '/knowledge', icon: <BookOutlined />, label: '知识库', },
-    { key: '/copilot', icon: <AiOutlined />, label: 'AI 助手', },
+    { key: '/copilot', icon: <ApiOutlined />, label: 'AI 助手', },
     { type: 'divider' },
     { key: '/settings', icon: <SettingOutlined />, label: '系统设置', },
   ];
