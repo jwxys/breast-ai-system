@@ -1,5 +1,16 @@
-import { useState } from 'react';
-import { Layout, Menu, Avatar, Dropdown, Badge } from 'antd';
+/**
+ * 增强的布局组件
+ * 
+ * 优化内容:
+ * - 响应式侧边栏
+ * - Breadcrumb 导航
+ * - 用户菜单
+ * - 通知系统
+ * - 暗黑模式切换
+ */
+
+import { useState, useEffect } from 'react';
+import { Layout, Menu, Avatar, Dropdown, Badge, Button, Drawer, Space, Breadcrumb, theme } from 'antd';
 import {
   HomeOutlined,
   UserOutlined,
@@ -11,98 +22,99 @@ import {
   SettingOutlined,
   LogoutOutlined,
   BellOutlined,
-  MenuOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  MoonOutlined,
+  SunOutlined,
+  DashboardOutlined,
+  AiOutlined,
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import type { MenuProps } from 'antd';
+import './Layout.css';
 
 const { Header, Sider, Content } = Layout;
 
 export const AppLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { token } = theme.useToken();
 
+  // 检测屏幕尺寸
+  useEffect(() => {
+    const checkScreen = () => {
+      if (window.innerWidth < 768) {
+        setCollapsed(true);
+      }
+    };
+    checkScreen();
+    window.addEventListener('resize', checkScreen);
+    return () => window.removeEventListener('resize', checkScreen);
+  }, []);
+
+  // 暗黑模式切换
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  // 菜单配置
   const menuItems: MenuProps['items'] = [
-    {
-      key: '/',
-      icon: <HomeOutlined />,
-      label: '首页',
-    },
-    {
-      key: '/patient',
-      icon: <UserOutlined />,
-      label: '患者管理',
-    },
-    {
-      key: '/visit',
-      icon: <CalendarOutlined />,
-      label: '随访管理',
-    },
-    {
-      key: '/ultrasound',
-      icon: <FileImageOutlined />,
-      label: '超声检查',
-    },
-    {
-      key: '/diagnosis',
-      icon: <FileTextOutlined />,
-      label: '诊断管理',
-    },
-    {
-      key: '/treatment',
-      icon: <MedicineBoxOutlined />,
-      label: '治疗管理',
-    },
-    {
-      key: '/knowledge',
-      icon: <BookOutlined />,
-      label: '知识库',
-    },
-    {
-      key: '/settings',
-      icon: <SettingOutlined />,
-      label: '系统设置',
-    },
+    { key: '/dashboard', icon: <DashboardOutlined />, label: '仪表盘', },
+    { type: 'divider' },
+    { key: '/patient', icon: <UserOutlined />, label: '患者管理', },
+    { key: '/visit', icon: <CalendarOutlined />, label: '随访管理', },
+    { type: 'divider' },
+    { key: '/ultrasound', icon: <FileImageOutlined />, label: '超声检查', },
+    { key: '/diagnosis', icon: <FileTextOutlined />, label: '诊断管理', },
+    { type: 'divider' },
+    { key: '/treatment', icon: <MedicineBoxOutlined />, label: '治疗方案', },
+    { key: '/knowledge', icon: <BookOutlined />, label: '知识库', },
+    { key: '/copilot', icon: <AiOutlined />, label: 'AI 助手', },
+    { type: 'divider' },
+    { key: '/settings', icon: <SettingOutlined />, label: '系统设置', },
   ];
 
-  const userMenuItems: MenuProps['items'] = [
-    {
-      key: 'profile',
-      icon: <UserOutlined />,
-      label: '个人中心',
-    },
-    {
-      key: 'logout',
-      icon: <LogoutOutlined />,
-      label: '退出登录',
-      onClick: () => {
-        navigate('/login');
-      },
-    },
+  // 用户菜单
+  const userMenu: MenuProps['items'] = [
+    { key: 'profile', icon: <UserOutlined />, label: '个人中心', },
+    { key: 'settings', icon: <SettingOutlined />, label: '账户设置', },
+    { type: 'divider' },
+    { key: 'logout', icon: <LogoutOutlined />, label: '退出登录', danger: true, },
   ];
+
+  // 面包屑导航
+  const getBreadcrumbItems = () => {
+    const path = location.pathname;
+    const items = [{ title: <HomeOutlined />, href: '/dashboard' }];
+    
+    const currentMenu = menuItems.find(item => item?.key === path);
+    if (currentMenu) {
+      items.push({ title: String(currentMenu.label) });
+    }
+    
+    return items;
+  };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout className="app-layout" style={{ minHeight: '100vh' }}>
+      {/* 侧边栏 - 桌面端 */}
       <Sider
+        trigger={null}
         collapsible
         collapsed={collapsed}
-        onCollapse={setCollapsed}
-        theme="dark"
+        breakpoint="lg"
+        className="app-sider"
+        width={256}
       >
-        <div
-          style={{
-            height: 64,
-            margin: collapsed ? 'auto' : '16px',
-            background: 'rgba(255, 255, 255, 0.2)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#fff',
-            fontWeight: 600,
-          }}
-        >
-          {collapsed ? '🏥' : '乳腺 AI 系统'}
+        <div className="logo">
+          {collapsed ? '🏥' : <span>🏥 乳腺 AI 诊断系统</span>}
         </div>
         <Menu
           theme="dark"
@@ -113,47 +125,77 @@ export const AppLayout = () => {
         />
       </Sider>
 
-      <Layout>
-        <Header
-          style={{
-            padding: '0 24px',
-            background: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+      {/* 移动端侧边栏 */}
+      <Drawer
+        placement="left"
+        onClose={() => setMobileOpen(false)}
+        open={mobileOpen}
+        className="mobile-drawer"
+        bodyStyle={{ padding: 0 }}
+      >
+        <div className="logo" style={{ padding: 16 }}>🏥 乳腺 AI 诊断系统</div>
+        <Menu
+          theme="light"
+          mode="inline"
+          selectedKeys={[location.pathname]}
+          items={menuItems}
+          onClick={({ key }) => {
+            navigate(key);
+            setMobileOpen(false);
           }}
-        >
-          <h2 style={{ margin: 0 }}>
-            {menuItems.find((item) => item?.key === location.pathname)?.label || '乳腺 AI 辅助诊断系统'}
-          </h2>
+        />
+      </Drawer>
+
+      <Layout>
+        {/* 顶部导航 */}
+        <Header className="app-header" style={{ padding: '0 16px' }}>
+          <div className="header-left">
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => {
+                if (window.innerWidth < 768) {
+                  setMobileOpen(true);
+                } else {
+                  setCollapsed(!collapsed);
+                }
+              }}
+              className="trigger"
+            />
+            <Breadcrumb items={getBreadcrumbItems()} />
+          </div>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <Badge count={5} size="small">
-              <BellOutlined style={{ fontSize: 20, cursor: 'pointer' }} />
+          <div className="header-right">
+            {/* 通知 */}
+            <Badge count={3} size="small">
+              <Button type="text" icon={<BellOutlined />} />
             </Badge>
 
-            <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                <Avatar icon={<UserOutlined />} />
-                <span>王伟 医生</span>
-              </div>
+            {/* 暗黑模式切换 */}
+            <Button
+              type="text"
+              icon={darkMode ? <SunOutlined /> : <MoonOutlined />}
+              onClick={() => setDarkMode(!darkMode)}
+            />
+
+            {/* 用户菜单 */}
+            <Dropdown menu={{ items: userMenu }} placement="bottomRight">
+              <Avatar
+                style={{ backgroundColor: token.colorPrimary, cursor: 'pointer' }}
+                icon={<UserOutlined />}
+                size="default"
+              />
             </Dropdown>
           </div>
         </Header>
 
-        <Content
-          style={{
-            margin: 24,
-            padding: 24,
-            background: '#fff',
-            minHeight: 280,
-          }}
-        >
-          <Outlet />
+        {/* 内容区域 */}
+        <Content className="app-content">
+          <div className="content-wrapper">
+            <Outlet />
+          </div>
         </Content>
       </Layout>
     </Layout>
   );
 };
-
-export default AppLayout;

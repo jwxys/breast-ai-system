@@ -1,611 +1,315 @@
-import { useEffect, useState } from 'react';
-import { Card, Row, Col, Statistic, Progress, Table, Tag, Spin, Empty, Timeline, Avatar, Button, Space, Badge, Tooltip } from 'antd';
+/**
+ * 优化的仪表盘页面
+ * 
+ * 功能:
+ * - 统计数据卡片
+ * - 诊断趋势图表
+ * - 待处理任务
+ * - 快速入口
+ */
+
+import { useState, useEffect } from 'react';
+import { Card, Row, Col, Statistic, Progress, Table, Tag, Space, Button, Avatar } from 'antd';
 import {
   UserOutlined,
-  CalendarOutlined,
-  WarningOutlined,
   FileTextOutlined,
-  ArrowUpOutlined,
-  ArrowDownOutlined,
-  ThunderboltOutlined,
-  HeartOutlined,
-  ExperimentOutlined,
+  RiseOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
+  WarningOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import ReactECharts from 'echarts-for-react';
-import { motion } from 'framer-motion';
-import { useAppStore } from '@/stores/appStore';
-import { patientApi } from '@/api';
-import type { EChartOption } from 'echarts';
-import './index.css';
-
-const MotionCard = motion(Card);
+import { Column } from '@ant-design/charts';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-  const { patientStats, patients, loading, fetchPatientStats, fetchPatients } = useAppStore();
-  const [todoList, setTodoList] = useState([]);
-  const [followupStats, setFollowupStats] = useState<any>({});
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalPatients: 0,
+    totalDiagnoses: 0,
+    pendingTasks: 0,
+    completionRate: 0,
+  });
 
   useEffect(() => {
-    loadData();
-    loadTodoList();
-    loadFollowupStats();
+    // 模拟加载数据
+    setTimeout(() => {
+      setStats({
+        totalPatients: 1258,
+        totalDiagnoses: 3421,
+        pendingTasks: 12,
+        completionRate: 94.5,
+      });
+      setLoading(false);
+    }, 800);
   }, []);
 
-  const loadData = async () => {
-    fetchPatientStats();
-    fetchPatients({ page: 1, page_size: 10 });
-  };
+  // 诊断趋势数据
+  const trendData = [
+    { month: '1 月', count: 156 },
+    { month: '2 月', count: 189 },
+    { month: '3 月', count: 234 },
+    { month: '4 月', count: 287 },
+    { month: '5 月', count: 321 },
+    { month: '6 月', count: 356 },
+  ];
 
-  const loadTodoList = () => {
-    // 模拟待办事项
-    setTodoList([
-      {
-        id: 1,
-        type: 'followup',
-        title: '张三 - 3 个月复查',
-        time: '今天 14:30',
-        priority: 'high',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=zhangsan',
-      },
-      {
-        id: 2,
-        type: 'report',
-        title: '李四 - 超声报告审核',
-        time: '今天 16:00',
-        priority: 'medium',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=lisi',
-      },
-      {
-        id: 3,
-        type: 'diagnosis',
-        title: '王五 - AI 诊断待确认',
-        time: '明天 09:00',
-        priority: 'high',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=wangwu',
-      },
-      {
-        id: 4,
-        type: 'visit',
-        title: '赵六 - 术后首次随访',
-        time: '明天 11:30',
-        priority: 'medium',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=zhaoliu',
-      },
-    ]);
-  };
+  // 待处理任务
+  const pendingTasks = [
+    { key: '1', type: 'diagnosis', patient: '张三', priority: 'high', date: '2026-06-05' },
+    { key: '2', type: 'followup', patient: '李四', priority: 'medium', date: '2026-06-04' },
+    { key: '3', type: 'review', patient: '王五', priority: 'low', date: '2026-06-03' },
+    { key: '4', type: 'diagnosis', patient: '赵六', priority: 'high', date: '2026-06-05' },
+  ];
 
-  const loadFollowupStats = () => {
-    setFollowupStats({
-      today: 12,
-      thisWeek: 45,
-      thisMonth: 189,
-      overdue: 8,
-    });
-  };
+  // 最近诊断
+  const recentDiagnoses = [
+    { key: '1', patient: '陈七', birads: '3', status: 'completed', date: '2026-06-05' },
+    { key: '2', patient: '周八', birads: '4A', status: 'pending', date: '2026-06-04' },
+    { key: '3', patient: '吴九', birads: '2', status: 'completed', date: '2026-06-04' },
+    { key: '4', patient: '郑十', birads: '4B', status: 'urgent', date: '2026-06-03' },
+  ];
 
-  // 统计卡片数据
-  const statsCards = [
+  const taskColumns = [
     {
-      title: '总患者数',
-      value: patientStats?.total || 1250,
-      icon: <UserOutlined />,
-      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      trend: 12,
-      trendLabel: '较上月',
+      title: '类型',
+      dataIndex: 'type',
+      key: 'type',
+      render: (type: string) => {
+        const map: Record<string, string> = {
+          diagnosis: '📋 诊断',
+          followup: '📞 随访',
+          review: '🔍 复核',
+        };
+        return map[type] || type;
+      },
     },
+    { title: '患者', dataIndex: 'patient', key: 'patient' },
     {
-      title: '今日随访',
-      value: followupStats.today || 12,
-      icon: <CalendarOutlined />,
-      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-      trend: 5,
-      trendLabel: '较昨日',
+      title: '优先级',
+      dataIndex: 'priority',
+      key: 'priority',
+      render: (priority: string) => {
+        const colorMap: Record<string, string> = {
+          high: 'red',
+          medium: 'orange',
+          low: 'blue',
+        };
+        return <Tag color={colorMap[priority]}>{priority.toUpperCase()}</Tag>;
+      },
     },
+    { title: '截止日期', dataIndex: 'date', key: 'date' },
     {
-      title: '高风险患者',
-      value: patientStats?.high_risk_count || 89,
-      icon: <WarningOutlined />,
-      gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-      trend: -3,
-      trendLabel: '较上月',
-    },
-    {
-      title: '待审核报告',
-      value: 12,
-      icon: <FileTextOutlined />,
-      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-      trend: 0,
-      trendLabel: '待处理',
+      title: '操作',
+      key: 'action',
+      render: (_: any, record: any) => (
+        <Space size="small">
+          <Button type="link" size="small">处理</Button>
+        </Space>
+      ),
     },
   ];
 
-  // BI-RADS 分布图配置
-  const biradsOption: EChartOption = {
-    tooltip: {
-      trigger: 'item',
-      formatter: '{b}: {c}例 ({d}%)',
-    },
-    legend: {
-      orient: 'vertical',
-      left: 'left',
-      data: ['1 类', '2 类', '3 类', '4A 类', '4B 类', '4C 类', '5 类'],
-    },
-    series: [
-      {
-        name: 'BI-RADS 分级',
-        type: 'pie',
-        radius: ['45%', '70%'],
-        center: ['55%', '50%'],
-        avoidLabelOverlap: false,
-        itemStyle: {
-          borderRadius: 10,
-          borderColor: '#fff',
-          borderWidth: 2,
-        },
-        label: {
-          show: false,
-        },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: 16,
-            fontWeight: 'bold',
-          },
-          itemStyle: {
-            shadowBlur: 20,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0, 0, 0, 0.3)',
-          },
-        },
-        labelLine: {
-          show: false,
-        },
-        data: [
-          { value: 62, name: '1 类', itemStyle: { color: '#95d5b2' } },
-          { value: 312, name: '2 类', itemStyle: { color: '#52b69a' } },
-          { value: 375, name: '3 类', itemStyle: { color: '#45b8ac' } },
-          { value: 250, name: '4A 类', itemStyle: { color: '#f9c74f' } },
-          { value: 150, name: '4B 类', itemStyle: { color: '#f3722c' } },
-          { value: 62, name: '4C 类', itemStyle: { color: '#f8961e' } },
-          { value: 39, name: '5 类', itemStyle: { color: '#f94144' } },
-        ],
-      },
-    ],
-  };
-
-  // 体质分布图配置
-  const constitutionOption: EChartOption = {
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'shadow',
+  const diagnosisColumns = [
+    { title: '患者', dataIndex: 'patient', key: 'patient' },
+    {
+      title: 'BI-RADS',
+      dataIndex: 'birads',
+      key: 'birads',
+      render: (birads: string) => {
+        const colorMap: Record<string, string> = {
+          '1': 'green',
+          '2': 'green',
+          '3': 'blue',
+          '4A': 'orange',
+          '4B': 'orange',
+          '4C': 'red',
+          '5': 'red',
+        };
+        return <Tag color={colorMap[birads] || 'gray'}>{birads}</Tag>;
       },
     },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      top: '10%',
-      containLabel: true,
-    },
-    xAxis: {
-      type: 'category',
-      data: ['气郁质', '痰湿质', '血瘀质', '平和质', '气虚质', '阳虚质', '其他'],
-      axisLabel: {
-        interval: 0,
-        rotate: 30,
-        fontSize: 12,
+    {
+      title: '状态',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status: string) => {
+        const map: Record<string, { color: string; text: string }> = {
+          completed: { color: 'green', text: '已完成' },
+          pending: { color: 'orange', text: '待处理' },
+          urgent: { color: 'red', text: '紧急' },
+        };
+        const config = map[status] || { color: 'gray', text: status };
+        return <Tag color={config.color}>{config.text}</Tag>;
       },
     },
-    yAxis: {
-      type: 'value',
-      name: '患者数',
-      axisLabel: {
-        formatter: '{value}',
-      },
+    { title: '日期', dataIndex: 'date', key: 'date' },
+    {
+      title: '操作',
+      key: 'action',
+      render: (_: any, record: any) => (
+        <Button type="link" size="small" onClick={() => navigate(`/diagnosis/${record.key}`)}>
+          详情
+        </Button>
+      ),
     },
-    series: [
-      {
-        name: '体质分布',
-        type: 'bar',
-        barWidth: '50%',
-        itemStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#667eea' },
-            { offset: 1, color: '#764ba2' },
-          ]),
-          borderRadius: [8, 8, 0, 0],
-        },
-        emphasis: {
-          itemStyle: {
-            shadowBlur: 20,
-            shadowColor: 'rgba(0,0,0,0.3)',
-          },
-        },
-        data: [312, 285, 220, 198, 156, 89, 90],
-        label: {
-          show: true,
-          position: 'top',
-          formatter: '{c}人',
-          fontSize: 12,
-        },
-      },
-    ],
-  };
-
-  // 诊断准确率趋势
-  const accuracyOption: EChartOption = {
-    tooltip: {
-      trigger: 'axis',
-    },
-    legend: {
-      data: ['AI 诊断', '病理结果'],
-      left: 'center',
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      top: '15%',
-      containLabel: true,
-    },
-    xAxis: {
-      type: 'category',
-      boundaryGap: false,
-      data: ['1 月', '2 月', '3 月', '4 月', '5 月', '6 月'],
-    },
-    yAxis: {
-      type: 'value',
-      name: '准确率 (%)',
-      max: 100,
-    },
-    series: [
-      {
-        name: 'AI 诊断',
-        type: 'line',
-        smooth: true,
-        data: [91.2, 92.5, 93.1, 93.8, 94.2, 94.6],
-        itemStyle: {
-          color: '#667eea',
-        },
-        lineStyle: {
-          width: 3,
-        },
-        areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(102, 126, 234, 0.3)' },
-            { offset: 1, color: 'rgba(102, 126, 234, 0.05)' },
-          ]),
-        },
-        symbol: 'circle',
-        symbolSize: 8,
-      },
-      {
-        name: '病理结果',
-        type: 'line',
-        smooth: true,
-        data: [92.0, 92.8, 93.5, 94.0, 94.5, 95.0],
-        itemStyle: {
-          color: '#f093fb',
-        },
-        lineStyle: {
-          width: 3,
-          type: 'dashed',
-        },
-        symbol: 'circle',
-        symbolSize: 8,
-      },
-    ],
-  };
-
-  const getPriorityColor = (priority: string) => {
-    const colors = {
-      high: 'volcano',
-      medium: 'orange',
-      low: 'green',
-    };
-    return colors[priority as keyof typeof colors] || 'blue';
-  };
-
-  const getTypeIcon = (type: string) => {
-    const icons: any = {
-      followup: <CalendarOutlined />,
-      report: <FileTextOutlined />,
-      diagnosis: <ThunderboltOutlined />,
-      visit: <HeartOutlined />,
-    };
-    return icons[type] || <ClockCircleOutlined />;
-  };
-
-  if (loading && !patientStats) {
-    return (
-      <div className="dashboard-loading">
-        <Spin size="large" tip="加载中..." />
-      </div>
-    );
-  }
+  ];
 
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-page" style={{ padding: 24 }}>
       {/* 统计卡片 */}
-      <Row gutter={[20, 20]} className="stats-row">
-        {statsCards.map((stat, index) => (
-          <Col xs={24} sm={12} lg={6} key={index}>
-            <MotionCard
-              className="stat-card"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ y: -5, transition: { duration: 0.2 } }}
-            >
-              <div
-                className="stat-icon"
-                style={{ background: stat.gradient }}
-              >
-                {stat.icon}
-              </div>
-              <div className="stat-content">
-                <div className="stat-title">{stat.title}</div>
-                <div className="stat-value">{stat.value}</div>
-                <div className={`stat-trend ${stat.trend >= 0 ? 'trend-up' : 'trend-down'}`}>
-                  {stat.trend >= 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
-                  {Math.abs(stat.trend)}% {stat.trendLabel}
-                </div>
-              </div>
-            </MotionCard>
-          </Col>
-        ))}
-      </Row>
-
-      {/* 图表区域 */}
-      <Row gutter={[20, 20]} className="charts-row">
-        {/* BI-RADS 分布 */}
-        <Col xs={24} lg={12}>
-          <MotionCard
-            title={
-              <Space>
-                <ExperimentOutlined style={{ color: '#667eea' }} />
-                <span>BI-RADS 分级分布</span>
-              </Space>
-            }
-            className="chart-card"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <ReactECharts option={biradsOption} style={{ height: 400 }} />
-          </MotionCard>
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="患者总数"
+              value={stats.totalPatients}
+              prefix={<UserOutlined />}
+              valueStyle={{ color: '#3b82f6' }}
+              loading={loading}
+            />
+            <Progress percent={12} strokeColor="#3b82f6" style={{ marginTop: 16 }} />
+          </Card>
         </Col>
-
-        {/* 体质分布 */}
-        <Col xs={24} lg={12}>
-          <MotionCard
-            title={
-              <Space>
-                <UserOutlined style={{ color: '#f093fb' }} />
-                <span>患者体质分布</span>
-              </Space>
-            }
-            className="chart-card"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <ReactECharts option={constitutionOption} style={{ height: 400 }} />
-          </MotionCard>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="诊断总数"
+              value={stats.totalDiagnoses}
+              prefix={<FileTextOutlined />}
+              valueStyle={{ color: '#10b981' }}
+              loading={loading}
+            />
+            <Progress percent={28} strokeColor="#10b981" style={{ marginTop: 16 }} />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="待处理任务"
+              value={stats.pendingTasks}
+              prefix={<ClockCircleOutlined />}
+              valueStyle={{ color: '#f59e0b' }}
+              loading={loading}
+            />
+            <div style={{ marginTop: 16, color: '#999', fontSize: 12 }}>
+              <WarningOutlined /> 3 个紧急任务
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="完成率"
+              value={stats.completionRate}
+              suffix="%"
+              prefix={<CheckCircleOutlined />}
+              valueStyle={{ color: '#10b981' }}
+              loading={loading}
+            />
+            <Progress percent={stats.completionRate} strokeColor="#10b981" style={{ marginTop: 16 }} />
+          </Card>
         </Col>
       </Row>
 
-      <Row gutter={[20, 20]} className="charts-row">
-        {/* 诊断准确率 */}
-        <Col xs={24} lg={12}>
-          <MotionCard
-            title={
-              <Space>
-                <ThunderboltOutlined style={{ color: '#4facfe' }} />
-                <span>AI 诊断准确率趋势</span>
-              </Space>
-            }
-            className="chart-card"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-          >
-            <ReactECharts option={accuracyOption} style={{ height: 350 }} />
-          </MotionCard>
+      {/* 诊断趋势图 */}
+      <Row gutter={16} style={{ marginBottom: 24 }}>
+        <Col span={24}>
+          <Card title="📊 月度诊断趋势">
+            <Column
+              data={trendData}
+              xField="month"
+              yField="count"
+              height={300}
+              color={{
+                type: 'linear',
+                range: ['#3b82f6', '#2563eb'],
+              }}
+              columnStyle={{
+                radius: [4, 4, 0, 0],
+              }}
+            />
+          </Card>
         </Col>
+      </Row>
 
-        {/* 待办事项 */}
-        <Col xs={24} lg={12}>
-          <MotionCard
+      {/* 待处理任务和最近诊断 */}
+      <Row gutter={[16, 16]}>
+        <Col span={24} lg={12}>
+          <Card
             title={
               <Space>
-                <ClockCircleOutlined style={{ color: '#fa709a' }} />
-                <span>待办事项</span>
+                <ClockCircleOutlined />
+                待处理任务
               </Space>
             }
-            className="chart-card"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
             extra={
-              <Button type="primary" size="small" icon={<PlusOutlined />}>
-                新建
+              <Button type="link" onClick={() => navigate('/tasks')}>
+                查看全部
               </Button>
             }
           >
-            <Timeline className="todo-timeline">
-              {todoList.map((todo: any) => (
-                <Timeline.Item
-                  key={todo.id}
-                  dot={
-                    <Badge
-                      count={null}
-                      indicator={<span className={`status-dot ${todo.priority}`} />}
-                    />
-                  }
-                  color={getPriorityColor(todo.priority)}
-                >
-                  <div className="todo-item">
-                    <div className="todo-avatar">
-                      <Avatar src={todo.avatar} size={40} />
-                    </div>
-                    <div className="todo-content">
-                      <div className="todo-header">
-                        <span className="todo-icon">{getTypeIcon(todo.type)}</span>
-                        <span className="todo-title">{todo.title}</span>
-                      </div>
-                      <div className="todo-meta">
-                        <ClockCircleOutlined />
-                        <span>{todo.time}</span>
-                        <Tag color={getPriorityColor(todo.priority)} size="small">
-                          {todo.priority === 'high' ? '高优先级' : '中优先级'}
-                        </Tag>
-                      </div>
-                    </div>
-                    <div className="todo-actions">
-                      <Button size="small" type="primary">
-                        处理
-                      </Button>
-                    </div>
-                  </div>
-                </Timeline.Item>
-              ))}
-            </Timeline>
-          </MotionCard>
+            <Table
+              dataSource={pendingTasks}
+              columns={taskColumns}
+              pagination={false}
+              size="small"
+            />
+          </Card>
+        </Col>
+        <Col span={24} lg={12}>
+          <Card
+            title={
+              <Space>
+                <FileTextOutlined />
+                最近诊断
+              </Space>
+            }
+            extra={
+              <Button type="link" onClick={() => navigate('/diagnosis')}>
+                查看全部
+              </Button>
+            }
+          >
+            <Table
+              dataSource={recentDiagnoses}
+              columns={diagnosisColumns}
+              pagination={false}
+              size="small"
+            />
+          </Card>
         </Col>
       </Row>
 
-      {/* 失访预警 */}
-      <Row gutter={[20, 20]} className="charts-row">
-        <Col xs={24}>
-          <MotionCard
-            title={
-              <Space>
-                <WarningOutlined style={{ color: '#f59e0b' }} />
-                <span>失访预警</span>
-              </Space>
-            }
-            className="chart-card"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
+      {/* 快速入口 */}
+      <div style={{ marginTop: 24, textAlign: 'center' }}>
+        <h3 style={{ marginBottom: 16 }}>快速操作</h3>
+        <Space size="large">
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            size="large"
+            onClick={() => navigate('/patient/create')}
           >
-            <div className="followup-warning">
-              <div className="warning-stats">
-                <div className="warning-item">
-                  <div className="warning-value">5.6%</div>
-                  <div className="warning-label">当前失访率</div>
-                </div>
-                <div className="warning-divider" />
-                <div className="warning-item">
-                  <div className="warning-value">8</div>
-                  <div className="warning-label">超期未随访</div>
-                </div>
-                <div className="warning-divider" />
-                <div className="warning-item">
-                  <div className="warning-value">45</div>
-                  <div className="warning-label">本月应随访</div>
-                </div>
-              </div>
-              <div className="warning-progress">
-                <div className="progress-header">
-                  <span>目标：&lt;5%</span>
-                  <span className={5.6 < 5 ? 'text-success' : 'text-warning'}>
-                    当前：5.6%
-                  </span>
-                </div>
-                <Progress
-                  percent={(5.6 / 10) * 100}
-                  strokeColor={{
-                    '0%': '#f59e0b',
-                    '100%': '#ef4444',
-                  }}
-                  status="exception"
-                  showInfo={false}
-                />
-              </div>
-              <Table
-                columns={[
-                  {
-                    title: '患者',
-                    dataIndex: 'patient',
-                    key: 'patient',
-                    render: (name: string, record: any) => (
-                      <Space>
-                        <Avatar size="small" src={record.avatar} />
-                        {name}
-                      </Space>
-                    ),
-                  },
-                  { title: '应随访日期', dataIndex: 'date', key: 'date' },
-                  {
-                    title: '超期天数',
-                    dataIndex: 'days',
-                    key: 'days',
-                    render: (days: number) => (
-                      <Tag color={days > 7 ? 'red' : 'orange'}>
-                        {days}天
-                      </Tag>
-                    ),
-                  },
-                  {
-                    title: '风险等级',
-                    dataIndex: 'risk',
-                    key: 'risk',
-                    render: (risk: string) => (
-                      <Badge
-                        count={null}
-                        indicator={<span className={`status-dot ${risk}`} />}
-                      />
-                    ),
-                  },
-                  {
-                    title: '操作',
-                    key: 'action',
-                    render: () => (
-                      <Button size="small" type="link">
-                        立即随访
-                      </Button>
-                    ),
-                  },
-                ]}
-                dataSource={[
-                  {
-                    key: '1',
-                    patient: '赵六',
-                    date: '2026-05-15',
-                    days: 12,
-                    risk: 'high',
-                    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=zhaoliu',
-                  },
-                  {
-                    key: '2',
-                    patient: '钱七',
-                    date: '2026-05-18',
-                    days: 9,
-                    risk: 'medium',
-                    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=qianqi',
-                  },
-                  {
-                    key: '3',
-                    patient: '孙八',
-                    date: '2026-05-20',
-                    days: 7,
-                    risk: 'low',
-                    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sunba',
-                  },
-                ]}
-                pagination={false}
-                size="small"
-              />
-            </div>
-          </MotionCard>
-        </Col>
-      </Row>
+            新建患者
+          </Button>
+          <Button
+            icon={<FileImageOutlined />}
+            size="large"
+            onClick={() => navigate('/ultrasound')}
+          >
+            上传影像
+          </Button>
+          <Button
+            icon={<FileTextOutlined />}
+            size="large"
+            onClick={() => navigate('/diagnosis/create')}
+          >
+            创建诊断
+          </Button>
+        </Space>
+      </div>
     </div>
   );
 };

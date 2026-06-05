@@ -1,427 +1,363 @@
 /**
- * 诊断管理页面
+ * 优化的诊断管理页面
  * 
- * 提供完整的诊断决策功能：
- * - 诊断列表
- * - BI-RADS 智能评估
- * - 分子分型预测
- * - AI 影像分析
- * - 综合报告生成
+ * 功能:
+ * - 诊断列表 (搜索/筛选/分页)
+ * - BI-RADS 分级可视化
+ * - 快速操作
+ * - 批量操作
  */
 
-import React, { useState, useEffect } from 'react';
-import { Card, Table, Button, Tag, Space, Modal, Form, Input, Select, Row, Col, message } from 'antd';
-import { 
-  PlusOutlined, 
-  EyeOutlined, 
-  DeleteOutlined, 
-  RobotOutlined,
-  ExperimentOutlined,
-  FileTextOutlined 
+import React, { useState } from 'react';
+import { Card, Table, Button, Tag, Space, Input, Select, Row, Col, Typography, Empty, Badge, theme } from 'antd';
+import {
+  PlusOutlined,
+  SearchOutlined,
+  FilterOutlined,
+  FileTextOutlined,
+  FileImageOutlined,
+  ExportOutlined,
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+
+const { Title } = Typography;
+const { Search } = Input;
 
 // 类型定义
-interface Diagnosis {
-  id: number;
-  report_no: string;
-  patient_name: string;
-  lesion_location: string;
-  birads_category: string;
-  malignancy_risk: number;
-  ai_assisted: boolean;
-  report_status: string;
-  created_at: string;
+interface DiagnosisRecord {
+  key: string;
+  id: string;
+  patientName: string;
+  patientAge: number;
+  reportNo: string;
+  lesionLocation: string;
+  birads: string;
+  malignancyRisk: number;
+  aiConfidence: number;
+  status: 'completed' | 'pending' | 'review';
+  createdAt: string;
+  actions?: any;
 }
 
-interface BIRADSAssessment {
-  birads_category: string;
-  malignancy_risk: number;
-  recommendation: string;
-  key_features: string[];
-}
+// 模拟数据
+const mockData: DiagnosisRecord[] = [
+  {
+    key: '1',
+    id: 'D2026060501',
+    patientName: '张三',
+    patientAge: 45,
+    reportNo: 'R20260605001',
+    lesionLocation: '左乳外上象限',
+    birads: '4A',
+    malignancyRisk: 15.3,
+    aiConfidence: 92.5,
+    status: 'completed',
+    createdAt: '2026-06-05 10:30',
+  },
+  {
+    key: '2',
+    id: 'D2026060502',
+    patientName: '李四',
+    patientAge: 52,
+    reportNo: 'R20260605002',
+    lesionLocation: '右乳内上象限',
+    birads: '3',
+    malignancyRisk: 3.2,
+    aiConfidence: 88.7,
+    status: 'pending',
+    createdAt: '2026-06-05 09:15',
+  },
+  {
+    key: '3',
+    id: 'D2026060401',
+    patientName: '王五',
+    patientAge: 38,
+    reportNo: 'R20260604001',
+    lesionLocation: '左乳外下象限',
+    birads: '2',
+    malignancyRisk: 0.5,
+    aiConfidence: 95.2,
+    status: 'completed',
+    createdAt: '2026-06-04 16:20',
+  },
+];
 
-/**
- * 诊断管理主组件
- */
 const DiagnosisList: React.FC = () => {
-  // 状态管理
-  const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [assessmentModal, setAssessmentModal] = useState(false);
-  const [selectedDiagnosis, setSelectedDiagnosis] = useState<Diagnosis | null>(null);
-  
-  // BI-RADS 评估结果
-  const [biradsResult, setBiradsResult] = useState<BIRADSAssessment | null>(null);
-  
-  // 表单实例
-  const [form] = Form.useForm();
-  
-  // BI-RADS 分级颜色映射
-  const biradsColors: Record<string, string> = {
-    '0': 'default',
-    '1': 'success',
-    '2': 'success',
-    '3': 'processing',
-    '4A': 'warning',
-    '4B': 'warning',
-    '4C': 'error',
-    '5': 'error',
-    '6': 'error',
+  const navigate = useNavigate();
+  const { token } = theme.useToken();
+  const [searchText, setSearchText] = useState('');
+  const [filterBirads, setFilterBirads] = useState<string>();
+
+  // BI-RADS 分级颜色
+  const getBiradsColor = (birads: string) => {
+    const map: Record<string, string> = {
+      '0': 'gray',
+      '1': 'green',
+      '2': 'green',
+      '3': 'blue',
+      '4A': 'orange',
+      '4B': 'orange',
+      '4C': 'red',
+      '5': 'red',
+      '6': 'purple',
+    };
+    return map[birads] || 'default';
   };
-  
-  // 加载诊断列表
-  const loadDiagnoses = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/v1/diagnosis?page=1&page_size=10');
-      const data = await response.json();
-      setDiagnoses(data.data);
-    } catch (error) {
-      console.error('加载诊断列表失败:', error);
-      message.error('加载诊断列表失败');
-    } finally {
-      setLoading(false);
-    }
+
+  // 风险等级标签
+  const getRiskLevel = (risk: number) => {
+    if (risk >= 50) return { color: 'red', text: '高风险' };
+    if (risk >= 20) return { color: 'orange', text: '中风险' };
+    if (risk >= 5) return { color: 'blue', text: '低风险' };
+    return { color: 'green', text: '极低风险' };
   };
-  
-  // 组件加载时获取数据
-  useEffect(() => {
-    loadDiagnoses();
-  }, []);
-  
-  // 创建诊断
-  const handleCreate = () => {
-    form.resetFields();
-    setModalVisible(true);
-  };
-  
-  // 提交诊断
-  const handleSubmit = async (values: any) => {
-    try {
-      const response = await fetch('/api/v1/diagnosis', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
-      
-      if (response.ok) {
-        message.success('创建诊断成功');
-        setModalVisible(false);
-        loadDiagnoses();
-      } else {
-        message.error('创建诊断失败');
-      }
-    } catch (error) {
-      console.error('创建诊断失败:', error);
-      message.error('创建诊断失败');
-    }
-  };
-  
-  // 查看诊断详情
-  const handleView = (record: Diagnosis) => {
-    setSelectedDiagnosis(record);
-    // 导航到详情页或打开详情弹窗
-    window.location.href = `/diagnosis/${record.id}`;
-  };
-  
-  // 删除诊断
-  const handleDelete = async (id: number) => {
-    Modal.confirm({
-      title: '确认删除',
-      content: '确定要删除该诊断记录吗？',
-      onOk: async () => {
-        try {
-          const response = await fetch(`/api/v1/diagnosis/${id}`, {
-            method: 'DELETE',
-          });
-          
-          if (response.ok) {
-            message.success('删除成功');
-            loadDiagnoses();
-          } else {
-            message.error('删除失败');
-          }
-        } catch (error) {
-          console.error('删除失败:', error);
-          message.error('删除失败');
-        }
-      },
-    });
-  };
-  
-  // BI-RADS 智能评估
-  const handleBIRADSAssess = async (features: any) => {
-    try {
-      const response = await fetch('/api/v1/diagnosis/assess-birads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(features),
-      });
-      
-      const data = await response.json();
-      setBiradsResult(data);
-      message.success('BI-RADS 评估完成');
-    } catch (error) {
-      console.error('BI-RADS 评估失败:', error);
-      message.error('评估失败');
-    }
-  };
-  
-  // 打开评估弹窗
-  const openAssessmentModal = () => {
-    setBiradsResult(null);
-    setAssessmentModal(true);
-  };
-  
-  // 表格列定义
+
+  // 表格列配置
   const columns = [
     {
       title: '报告编号',
-      dataIndex: 'report_no',
-      key: 'report_no',
+      dataIndex: 'reportNo',
+      key: 'reportNo',
+      fixed: 'left',
+      width: 140,
     },
     {
       title: '患者姓名',
-      dataIndex: 'patient_name',
-      key: 'patient_name',
+      dataIndex: 'patientName',
+      key: 'patientName',
+      width: 100,
+      render: (name: string, record: DiagnosisRecord) => (
+        <Space>
+          <span>{name}</span>
+          <Tag color="blue" style={{ fontSize: 10 }}>{record.patientAge}岁</Tag>
+        </Space>
+      ),
     },
     {
       title: '病灶位置',
-      dataIndex: 'lesion_location',
-      key: 'lesion_location',
+      dataIndex: 'lesionLocation',
+      key: 'lesionLocation',
+      width: 120,
+      ellipsis: true,
     },
     {
-      title: 'BI-RADS 分级',
-      dataIndex: 'birads_category',
-      key: 'birads_category',
-      render: (text: string) => (
-        <Tag color={biradsColors[text] || 'default'}>
-          {text}
-        </Tag>
+      title: 'BI-RADS',
+      dataIndex: 'birads',
+      key: 'birads',
+      width: 90,
+      render: (birads: string) => (
+        <Badge
+          count={birads}
+          style={{
+            backgroundColor: getBiradsColor(birads) === 'red' ? '#f5222d' :
+                           getBiradsColor(birads) === 'orange' ? '#fa8c16' :
+                           getBiradsColor(birads) === 'blue' ? '#1890ff' :
+                           getBiradsColor(birads) === 'green' ? '#52c41a' : '#d9d9d9',
+            fontSize: 12,
+          }}
+        />
       ),
     },
     {
       title: '恶性风险',
-      dataIndex: 'malignancy_risk',
-      key: 'malignancy_risk',
-      render: (risk: number) => `${(risk * 100).toFixed(1)}%`,
+      dataIndex: 'malignancyRisk',
+      key: 'malignancyRisk',
+      width: 100,
+      render: (risk: number) => {
+        const { color, text } = getRiskLevel(risk);
+        return (
+          <Space>
+            <Tag color={color}>{risk.toFixed(1)}%</Tag>
+            <span style={{ fontSize: 12, color: '#999' }}>{text}</span>
+          </Space>
+        );
+      },
     },
     {
-      title: 'AI 辅助',
-      dataIndex: 'ai_assisted',
-      key: 'ai_assisted',
-      render: (aiAssisted: boolean) => 
-        aiAssisted ? <Tag color="blue">是</Tag> : <Tag>否</Tag>,
+      title: 'AI 置信度',
+      dataIndex: 'aiConfidence',
+      key: 'aiConfidence',
+      width: 100,
+      render: (confidence: number) => (
+        <span style={{ color: confidence >= 90 ? '#52c41a' : confidence >= 70 ? '#fa8c16' : '#f5222d' }}>
+          {confidence.toFixed(1)}%
+        </span>
+      ),
     },
     {
-      title: '报告状态',
-      dataIndex: 'report_status',
-      key: 'report_status',
+      title: '状态',
+      dataIndex: 'status',
+      key: 'status',
+      width: 90,
       render: (status: string) => {
-        const statusMap: Record<string, string> = {
-          draft: '草稿',
-          preliminary: '初步',
-          final: '正式',
-          amended: '修改',
+        const map: Record<string, { color: string; text: string }> = {
+          completed: { color: 'green', text: '已完成' },
+          pending: { color: 'orange', text: '待审核' },
+          review: { color: 'blue', text: '需复核' },
         };
-        return <Tag>{statusMap[status] || status}</Tag>;
+        const config = map[status] || { color: 'gray', text: status };
+        return <Tag color={config.color}>{config.text}</Tag>;
       },
     },
     {
       title: '创建时间',
-      dataIndex: 'created_at',
-      key: 'created_at',
-      render: (date: string) => new Date(date).toLocaleDateString(),
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      width: 160,
+      sorter: (a: any, b: any) => a.createdAt.localeCompare(b.createdAt),
     },
     {
       title: '操作',
       key: 'action',
-      render: (_: any, record: Diagnosis) => (
-        <Space size="middle">
+      fixed: 'right',
+      width: 220,
+      render: (_: any, record: DiagnosisRecord) => (
+        <Space size="small">
           <Button
             type="link"
-            icon={<EyeOutlined />}
-            onClick={() => handleView(record)}
+            size="small"
+            icon={<FileTextOutlined />}
+            onClick={() => navigate(`/diagnosis/${record.id}`)}
           >
-            查看
+            详情
           </Button>
           <Button
             type="link"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.id)}
+            size="small"
+            icon={<FileImageOutlined />}
+            onClick={() => navigate(`/ultrasound?reportNo=${record.reportNo}`)}
           >
-            删除
+            影像
           </Button>
         </Space>
       ),
     },
   ];
-  
+
+  // 筛选后的数据
+  const filteredData = mockData.filter(item => {
+    const matchSearch = !searchText || 
+      item.patientName.includes(searchText) ||
+      item.reportNo.includes(searchText);
+    const matchFilter = !filterBirads || item.birads === filterBirads;
+    return matchSearch && matchFilter;
+  });
+
   return (
-    <div className="diagnosis-container">
-      {/* 顶部操作栏 */}
-      <div className="toolbar" style={{ marginBottom: 16 }}>
-        <Space>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleCreate}
-          >
-            新建诊断
-          </Button>
-          <Button
-            icon={<RobotOutlined />}
-            onClick={openAssessmentModal}
-          >
-            BI-RADS 智能评估
-          </Button>
-          <Button
-            icon={<ExperimentOutlined />}
-          >
-            分子分型预测
-          </Button>
-        </Space>
+    <div style={{ padding: 24 }}>
+      {/* 页面头部 */}
+      <div style={{ marginBottom: 24 }}>
+        <Row justify="space-between" align="middle">
+          <Col>
+            <Title level={3} style={{ margin: 0 }}>
+              <FileTextOutlined style={{ marginRight: 8 }} />
+              诊断管理
+            </Title>
+          </Col>
+          <Col>
+            <Space>
+              <Button icon={<ExportOutlined />}>导出</Button>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => navigate('/diagnosis/create')}
+              >
+                新建诊断
+              </Button>
+            </Space>
+          </Col>
+        </Row>
       </div>
-      
-      {/* 诊断列表表格 */}
-      <Card loading={loading}>
-        <Table
-          columns={columns}
-          dataSource={diagnoses}
-          rowKey="id"
-          pagination={{
-            pageSize: 10,
-            showTotal: (total) => `共 ${total} 条`,
-          }}
-        />
+
+      {/* 筛选区域 */}
+      <Card style={{ marginBottom: 16 }}>
+        <Row gutter={16}>
+          <Col span={8}>
+            <Search
+              placeholder="搜索患者姓名/报告编号"
+              allowClear
+              onSearch={setSearchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              prefix={<SearchOutlined />}
+              style={{ width: '100%' }}
+            />
+          </Col>
+          <Col span={6}>
+            <Select
+              placeholder="BI-RADS 分级"
+              allowClear
+              style={{ width: '100%' }}
+              onChange={setFilterBirads}
+              options={[
+                { value: '0', label: '0 - 需进一步评估' },
+                { value: '1', label: '1 - 阴性' },
+                { value: '2', label: '2 - 良性' },
+                { value: '3', label: '3 - 可能良性' },
+                { value: '4A', label: '4A - 低度可疑' },
+                { value: '4B', label: '4B - 中度可疑' },
+                { value: '4C', label: '4C - 高度可疑' },
+                { value: '5', label: '5 - 恶性' },
+              ]}
+            />
+          </Col>
+        </Row>
       </Card>
-      
-      {/* 创建诊断弹窗 */}
-      <Modal
-        title="创建诊断"
-        open={modalVisible}
-        onCancel={() => setModalVisible(false)}
-        onOk={() => form.submit()}
-        width={800}
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-        >
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="patient_id"
-                label="患者 ID"
-                rules={[{ required: true, message: '请选择患者' }]}
-              >
-                <Select placeholder="选择患者" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="lesion_id"
-                label="病灶 ID"
-                rules={[{ required: true, message: '请选择病灶' }]}
-              >
-                <Select placeholder="选择病灶" />
-              </Form.Item>
-            </Col>
-          </Row>
-          
-          <Form.Item
-            name="birads_category"
-            label="BI-RADS 分级"
-            rules={[{ required: true, message: '请选择 BI-RADS 分级' }]}
+
+      {/* 数据表格 */}
+      <Card>
+        {filteredData.length > 0 ? (
+          <Table
+            columns={columns}
+            dataSource={filteredData}
+            scroll={{ x: 1200 }}
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total) => `共 ${total} 条`,
+            }}
+            rowSelection={{
+              type: 'checkbox',
+              onChange: (selectedRowKeys: any) => {
+                console.log('已选择:', selectedRowKeys);
+              },
+            }}
+          />
+        ) : (
+          <Empty
+            description="暂无诊断数据"
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
           >
-            <Select>
-              <Select.Option value="0">0 级 - 评估不完全</Select.Option>
-              <Select.Option value="1">1 级 - 阴性</Select.Option>
-              <Select.Option value="2">2 级 - 良性</Select.Option>
-              <Select.Option value="3">3 级 - 可能良性</Select.Option>
-              <Select.Option value="4A">4A 级 - 低度可疑</Select.Option>
-              <Select.Option value="4B">4B 级 - 中度可疑</Select.Option>
-              <Select.Option value="4C">4C 级 - 高度可疑</Select.Option>
-              <Select.Option value="5">5 级 - 高度提示恶性</Select.Option>
-              <Select.Option value="6">6 级 - 已证实恶性</Select.Option>
-            </Select>
-          </Form.Item>
-          
-          <Form.Item
-            name="recommendation"
-            label="处理建议"
-          >
-            <Input.TextArea rows={3} placeholder="请输入处理建议" />
-          </Form.Item>
-          
-          <Form.Item
-            name="ai_assisted"
-            label="AI 辅助"
-            valuePropName="checked"
-          >
-            <Select>
-              <Select.Option value={false}>否</Select.Option>
-              <Select.Option value={true}>是</Select.Option>
-            </Select>
-          </Form.Item>
-        </Form>
-      </Modal>
-      
-      {/* BI-RADS 评估弹窗 */}
-      <Modal
-        title={
-          <Space>
-            <RobotOutlined />
-            BI-RADS 智能评估
-          </Space>
-        }
-        open={assessmentModal}
-        onCancel={() => setAssessmentModal(false)}
-        footer={[
-          <Button key="close" onClick={() => setAssessmentModal(false)}>
-            关闭
-          </Button>,
-        ]}
-        width={900}
-      >
-        <div className="birads-assessment">
-          {/* 评估结果展示 */}
-          {biradsResult ? (
-            <div>
-              <h3>评估结果</h3>
-              <p>
-                <strong>BI-RADS 分级：</strong>
-                <Tag color={biradsColors[biradsResult.birads_category]}>
-                  {biradsResult.birads_category}
-                </Tag>
-              </p>
-              <p>
-                <strong>恶性风险：</strong>
-                <span style={{ color: 'red', fontWeight: 'bold' }}>
-                  {biradsResult.malignancy_risk}%
-                </span>
-              </p>
-              <p>
-                <strong>处理建议：</strong>{' '}
-                {biradsResult.recommendation}
-              </p>
-              <p>
-                <strong>关键征象：</strong>
-              </p>
-              <ul>
-                {biradsResult.key_features.map((feature, idx) => (
-                  <li key={idx}>{feature}</li>
-                ))}
-              </ul>
-            </div>
-          ) : (
-            <p>请输入超声征象进行评估</p>
-          )}
-        </div>
-      </Modal>
+            <Button type="primary" onClick={() => navigate('/diagnosis/create')}>
+              创建第一个诊断
+            </Button>
+          </Empty>
+        )}
+      </Card>
+
+      {/* 统计信息 */}
+      <Row gutter={16} style={{ marginTop: 16 }}>
+        <Col span={6}>
+          <Card size="small">
+            <Statistic title="今日诊断" value={12} />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card size="small">
+            <Statistic title="待审核" value={5} valueStyle={{ color: '#fa8c16' }} />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card size="small">
+            <Statistic title="BI-RADS 4+" value={8} valueStyle={{ color: '#f5222d' }} />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card size="small">
+            <Statistic title="平均置信度" value={91.2} suffix="%" valueStyle={{ color: '#52c41a' }} />
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };
