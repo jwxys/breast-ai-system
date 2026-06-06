@@ -1,30 +1,31 @@
 # 项目文档索引
 
-## 📚 文档分类
+## 📚 快速导航
 
-### 使用指南 (guides/)
-- [安装指南](guides/INSTALL.md) - 完整安装步骤
-- [开发指南](guides/DEVELOPMENT.md) - 开发环境配置
-- [环境配置](guides/README_ENV_SETUP.md) - 环境变量说明
-- [代码注释规范](guides/CODE_COMMENTS_GUIDE.md) - 注释编写指南
+| 文档类型 | 文档 | 说明 |
+|---------|------|------|
+| **入门** | [安装指南](guides/INSTALL.md) | 完整安装步骤 |
+| | [开发指南](guides/DEVELOPMENT.md) | 开发环境配置 |
+| **说明** | [功能列表](../FEATURES_SUMMARY.md) | 系统功能介绍 |
+| **日志** | [更新日志](changelog/CHANGELOG.md) | 版本更新记录 |
 
-### API 文档 (api/)
-- [高级诊断功能](api/ADVANCED_DIAGNOSTICS.md)
-- [功能实现说明](api/ADVANCED_FEATURES_IMPLEMENTATION.md)
+## 📁 文档目录
 
-### 架构设计 (architecture/)
-- [GitHub 对标优化](architecture/GITHUB_COMPARISON_AND_OPTIMIZATION.md)
+```
+docs/
+├── guides/           # 使用指南
+│   ├── INSTALL.md    # 安装指南
+│   └── DEVELOPMENT.md # 开发指南
+├── changelog/        # 更新日志
+│   └── CHANGELOG.md  # 版本历史
+└── README.md         # 本文档索引
+```
 
-### 更新日志 (changelog/)
-- [清理总结](changelog/BREAST_AI_SYSTEM_CLEANUP_SUMMARY.md)
-- [修复总结](changelog/FIX_SUMMARY.md)
-- [语法检查报告](changelog/SYNTAX_CHECK_REPORT.md)
+## 🔗 快速链接
 
-## 🔗 外部链接
-
-- [项目主页](../README.md)
-- [功能总结](../FEATURES_SUMMARY.md)
+- [项目首页](../README.md)
+- [GitHub 仓库](https://github.com/jwxys/breast-ai-system)
 
 ---
 
-**最后更新**: 2026-06-05
+**最后更新**: 2026-06-06

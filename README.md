@@ -6,7 +6,7 @@ AI-powered breast cancer diagnosis assistance system
 
 ```bash
 # 安装后端依赖
-pip install -r requirements.txt --break-system-packages
+pip install -r requirements.txt
 
 # 安装前端依赖
 cd frontend && npm install
@@ -29,48 +29,33 @@ cd frontend && npm install
 │   ├── architecture/      # 架构设计
 │   └── changelog/         # 更新日志
 ├── scripts/                # 工具脚本
-│   ├── setup/             # 安装脚本
-│   ├── deploy/            # 部署脚本
-│   └── utils/             # 工具脚本
 └── config/                 # 配置文件
 ```
 
 ## 📖 文档导航
 
-| 文档 | 路径 | 说明 |
-|------|------|------|
-| 安装指南 | `docs/guides/INSTALL.md` | 详细安装步骤 |
-| 开发指南 | `docs/guides/DEVELOPMENT.md` | 开发环境配置 |
-| 功能说明 | `docs/FEATURES_SUMMARY.md` | 功能列表 |
-| API 文档 | `docs/api/` | API 接口说明 |
-| 架构设计 | `docs/architecture/` | 系统架构 |
+| 文档 | 路径 |
+|------|------|
+| [安装指南](docs/guides/INSTALL.md) | 详细安装步骤 |
+| [开发指南](docs/guides/DEVELOPMENT.md) | 开发环境配置 |
+| [功能说明](docs/FEATURES_SUMMARY.md) | 功能列表 |
+| [API 文档](docs/api/) | API 接口说明 |
+| [架构设计](docs/architecture/) | 系统架构 |
 
 ## 🔧 服务地址
 
-| 服务 | 地址 | 说明 |
-|------|------|------|
-| 前端页面 | http://localhost:3000 | React 应用 |
-| 后端 API | http://localhost:8005 | FastAPI 服务 |
-| API 文档 | http://localhost:8005/api/docs | Swagger UI |
+| 服务 | 地址 |
+|------|------|
+| 前端页面 | http://localhost:3000 |
+| 后端 API | http://localhost:8005 |
+| API 文档 | http://localhost:8005/api/docs |
 
 ## 📦 技术栈
 
-**后端**:
-- Python 3.11+
-- FastAPI
-- SQLAlchemy + asyncmy
-- PyTorch
+**后端**: Python 3.11+, FastAPI, SQLAlchemy, PyTorch
 
-**前端**:
-- React 18
-- TypeScript
-- Vite
-- Ant Design
-
-## 📄 许可证
-
-MIT License
+**前端**: React 18, TypeScript, Vite, Ant Design
 
 ---
 
-**v3.3.0** | 2026-06-05
+**v3.4.0** | 2026-06-06

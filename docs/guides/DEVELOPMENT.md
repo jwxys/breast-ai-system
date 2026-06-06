@@ -1,44 +1,60 @@
 # 开发指南
 
-## 🚀 快速启动
+## 开发环境配置
+
+### 1. 安装依赖
 
 ```bash
-./run.sh
+# 后端
+pip install -r requirements.txt
+
+# 前端
+cd frontend && npm install
 ```
 
-## 📁 项目结构
+### 2. 配置环境变量
 
-```
-.
-├── app/          # 后端 (FastAPI)
-├── frontend/     # 前端 (React)
-└── ai_chat/      # AI 服务
-```
+编辑 `.env` 和 `frontend/.env` 文件
 
-## 🔧 配置
+### 3. 启动开发服务器
 
-编辑 `app/.env`:
-```
-KIMI_API_KEY=sk-xxx
-QWEN_API_KEY=sk-xxx
-```
-
-## 📝 访问地址
-
-- 前端：http://localhost:3000
-- 后端 API: http://localhost:8000
-- API 文档：http://localhost:8000/api/docs
-
-## 💻 开发模式
-
-**单独启动后端**:
 ```bash
-cd app
-python -m uvicorn main:app --reload
+./scripts/run.sh
 ```
 
-**单独启动前端**:
+## 代码规范
+
+### 后端 (Python)
+- 遵循 PEP 8
+- 类型注解 (Type Hints)
+- 中文注释
+
+### 前端 (TypeScript)
+- ESLint + Prettier
+- React Hooks 规范
+- 中文注释
+
+## 提交规范
+
 ```bash
-cd frontend
-npm run dev
+# 格式
+<type>(<scope>): <subject>
+
+# 示例
+feat(diagnosis): 添加 AI 辅助诊断功能
+fix(types): 修复 TypeScript 语法错误
 ```
+
+## 测试
+
+```bash
+# 后端测试
+pytest
+
+# 前端测试
+cd frontend && npm run test
+```
+
+---
+
+**返回**: [安装指南](INSTALL.md) | [文档索引](../README.md)
